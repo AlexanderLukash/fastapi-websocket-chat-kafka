@@ -6,6 +6,7 @@ from app.domain.entities.messages import (
     Chat,
     Message,
 )
+from app.domain.events.messages import NewMessageReceivedEvent
 from app.domain.exceptions.messages import (
     EmptyTextException,
     TextTooLongException,
@@ -63,3 +64,24 @@ def test_add_chat_to_message():
     chat.add_message(message)
 
     assert message in chat.messages
+
+
+def test_new_message_events():
+    text = Text("Hello, world")
+    message = Message(text=text)
+
+    title = Title("Hello, world")
+    chat = Chat(title=title)
+
+    chat.add_message(message)
+    events = chat.pull_events()
+    pulled_events = chat.pull_events()
+
+    assert not pulled_events
+    assert len(events) == 1, events
+    new_events = events[0]
+
+    assert isinstance(new_events, NewMessageReceivedEvent), new_events
+    assert new_events.message_text == message.text.as_generic_type()
+    assert new_events.chat_oid == chat.oid
+    assert new_events.message_oid == message.oid

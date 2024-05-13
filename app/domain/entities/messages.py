@@ -2,9 +2,9 @@ from dataclasses import (
     dataclass,
     field,
 )
-from datetime import datetime
-from uuid import uuid4
 
+from app.domain.entities.base import BaseEntity
+from app.domain.events.messages import NewMessageReceivedEvent
 from app.domain.values.messages import (
     Text,
     Title,
@@ -12,16 +12,8 @@ from app.domain.values.messages import (
 
 
 @dataclass
-class Message:
-    oid: str = field(
-        default_factory=lambda: str(uuid4()),
-        kw_only=True,
-    )
+class Message(BaseEntity):
     text: Text
-    created_at: datetime = field(
-        default_factory=datetime.now,
-        kw_only=True,
-    )
 
     def __hash__(self) -> int:
         return hash(self.oid)
@@ -31,18 +23,10 @@ class Message:
 
 
 @dataclass
-class Chat:
-    oid: str = field(
-        default_factory=lambda: str(uuid4()),
-        kw_only=True,
-    )
+class Chat(BaseEntity):
     title: Title
     messages: set[Message] = field(
         default_factory=set,
-        kw_only=True,
-    )
-    created_at: datetime = field(
-        default_factory=datetime.now,
         kw_only=True,
     )
 
@@ -54,3 +38,10 @@ class Chat:
 
     def add_message(self, message: Message):
         self.messages.add(message)
+        self.register_event(
+            NewMessageReceivedEvent(
+                message_text=message.text.as_generic_type(),
+                message_oid=message.oid,
+                chat_oid=self.oid,
+            ),
+        )
