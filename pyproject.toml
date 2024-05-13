@@ -13,6 +13,44 @@ motor = "^3.4.0"
 uvicorn = {extras = ["all"], version = "^0.29.0"}
 
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pre-commit = "^3.7.1"
+isort = "^5.13.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+line_length = 120
+lines_after_imports = 2
+lines_between_sections = 1
+lines_between_types = 0
+force_alphabetical_sort_within_sections = true
+ensure_newline_before_comments = true
+combine_as_imports = true
+combine_star = true
+skip_gitignore = true
+balanced_wrapping = true
+force_grid_wrap = 2
+src_paths = ["core", ]
+skip_glob = [
+    ".git",
+    ".idea",
+    ".vscode",
+    "venv",
+    ".venv",
+]
+known_fastapi = ["fastapi"]
+known_first_party = ["app"]
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "FASTAPI",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "LOCALFOLDER",
+]

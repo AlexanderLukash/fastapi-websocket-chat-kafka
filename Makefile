@@ -20,3 +20,7 @@ app-logs:
 .PHONY: app-down
 app-down:
 	${DC} -f ${APP_FILE} down
+
+.PHONY: test
+test:
+	${EXEC} ${APP_CONTAINER} pytest

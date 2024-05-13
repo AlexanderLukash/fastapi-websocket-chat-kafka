@@ -4,6 +4,13 @@ from app.domain.exceptions.base import ApplicationException
 
 
 @dataclass(eq=False)
+class EmptyTextException(ApplicationException):
+    @property
+    def message(self) -> str:
+        return "Text is empty."
+
+
+@dataclass(eq=False)
 class TextTooLongException(ApplicationException):
     text: str
 
