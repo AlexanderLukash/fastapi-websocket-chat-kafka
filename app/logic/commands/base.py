@@ -1,23 +1,19 @@
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import (
-    Any,
-    TypeVar,
-)
+from typing import Any, Generic, TypeVar
 
 
 @dataclass(frozen=True)
-class BaseCommand(ABC): ...
+class BaseCommand(ABC):
+    ...
 
 
-CT = TypeVar(name="CT", bound=BaseCommand)
-CR = TypeVar(name="CR", bound=Any)
+CT = TypeVar('CT', bound=BaseCommand)
+CR = TypeVar('CR', bound=Any)
 
 
 @dataclass(frozen=True)
-class CommandHandler[CT, CR](ABC, CT):
+class CommandHandler(ABC, Generic[CT, CR]):
     @abstractmethod
-    def handle(self, command: CT) -> CR: ...
+    async def handle(self, command: CT) -> CR:
+        ...

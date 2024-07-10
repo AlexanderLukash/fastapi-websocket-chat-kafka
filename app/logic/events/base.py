@@ -1,17 +1,15 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import (
-    Any,
-    TypeVar,
-)
+from typing import Any, Generic, TypeVar
 
 from app.domain.events.base import BaseEvent
 
 
-ET = TypeVar(name="ET", bound=BaseEvent)
-ER = TypeVar(name="ER", bound=Any)
+ET = TypeVar('ET', bound=BaseEvent)
+ER = TypeVar('ER', bound=Any)
 
 
 @dataclass
-class EventHandler[ET, ER](ABC, ET):
-    def handle(self, event: ET) -> ER: ...
+class EventHandler(ABC, Generic[ET, ER]):
+    def handle(self, event: ET) -> ER:
+        ...

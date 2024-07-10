@@ -1,13 +1,10 @@
 from fastapi import FastAPI
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(
-        title="Simple FastAPI and Kafka chat",
-        description="Fast API for Kafka chat and streaming websocket.",
-        docs_url="/api/docs",
-        redoc_url="/api/redoc",
+def create_app():
+    return FastAPI(
+        title='Simple Kafka Chat',
+        docs_url='/api/docs',
+        description='A simple kafka + ddd example.',
         debug=True,
     )
-
-    return app

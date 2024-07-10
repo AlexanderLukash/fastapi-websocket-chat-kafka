@@ -3,19 +3,19 @@ from dataclasses import dataclass
 from app.logic.exceptions.base import LogicException
 
 
-@dataclass(frozen=True, eq=False)
-class EventHandlerNotRegisteredException(LogicException):
+@dataclass(eq=False)
+class EventHandlersNotRegisteredException(LogicException):
     event_type: type
 
     @property
-    def message(self) -> str:
-        return f'Event handler not registered: "{self.event_type}".'
+    def message(self):
+        return f'Не удалось найти обработчики для события: {self.event_type}'
 
 
-@dataclass(frozen=True, eq=False)
-class CommandHandlerNotRegisteredException(LogicException):
+@dataclass(eq=False)
+class CommandHandlersNotRegisteredException(LogicException):
     command_type: type
 
     @property
-    def message(self) -> str:
-        return f'Command handler not registered: "{self.command_type}".'
+    def message(self):
+        return f'Не удалось найти обработчики для команды: {self.command_type}'
