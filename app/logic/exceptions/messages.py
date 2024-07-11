@@ -9,4 +9,4 @@ class ChatWithThatTitleAlreadyExistsException(LogicException):
 
     @property
     def message(self):
-        return f'Чат с таким названием "{self.title}" уже существует.'
+        return f'A chat with the same name "{self.title}" already exists.'

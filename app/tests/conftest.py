@@ -1,18 +1,21 @@
+from punq import Container
 from pytest import fixture
 
-from app.infra.repositories.messages import BaseChatRepository, MemoryChatRepository
-from app.logic.init import init_mediator
+from app.infra.repositories.messages import BaseChatRepository
 from app.logic.mediator import Mediator
+from app.tests.fixtures import init_dummy_container
 
 
-@fixture(scope='package')
-def chat_repository() -> MemoryChatRepository:
-    return MemoryChatRepository()
+@fixture(scope="function")
+def container() -> Container:
+    return init_dummy_container()
 
 
-@fixture(scope='package')
-def mediator(chat_repository: BaseChatRepository) -> Mediator:
-    mediator = Mediator()
-    init_mediator(mediator=mediator, chat_repository=chat_repository)
+@fixture()
+def mediator(container: Container) -> Mediator:
+    return container.resolve(Mediator)
 
-    return mediator
+
+@fixture()
+def chat_repository(container: Container) -> BaseChatRepository:
+    return container.resolve(BaseChatRepository)

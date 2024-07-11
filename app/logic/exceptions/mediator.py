@@ -9,7 +9,7 @@ class EventHandlersNotRegisteredException(LogicException):
 
     @property
     def message(self):
-        return f'Не удалось найти обработчики для события: {self.event_type}'
+        return f"Could not find event handlers: {self.event_type}"
 
 
 @dataclass(eq=False)
@@ -18,4 +18,4 @@ class CommandHandlersNotRegisteredException(LogicException):
 
     @property
     def message(self):
-        return f'Не удалось найти обработчики для команды: {self.command_type}'
+        return f"Could not find handlers for the command: {self.command_type}"

@@ -7,4 +7,4 @@ from app.domain.exceptions.base import ApplicationException
 class LogicException(ApplicationException):
     @property
     def message(self):
-        return 'В обработки запроса возникла ошибка'
+        return "An error occurred while processing the request."
