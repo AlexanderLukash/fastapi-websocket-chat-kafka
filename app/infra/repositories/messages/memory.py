@@ -1,26 +1,14 @@
-from abc import (
-    ABC,
-    abstractmethod,
-)
 from dataclasses import (
     dataclass,
     field,
 )
 
 from app.domain.entities.messages import Chat
+from app.infra.repositories.messages.base import BaseChatRepository
 
 
 @dataclass
-class BaseChatRepository(ABC):
-    @abstractmethod
-    async def check_chat_exists_by_title(self, title: str) -> bool: ...
-
-    @abstractmethod
-    async def add_chat(self, chat: Chat) -> None: ...
-
-
-@dataclass
-class MemoryChatRepository(ABC):
+class MemoryChatRepository(BaseChatRepository):
     _saved_chats: list[Chat] = field(default_factory=list, kw_only=True)
 
     async def check_chat_exists_by_title(self, title: str) -> bool:

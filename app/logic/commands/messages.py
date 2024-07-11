@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from app.domain.entities.messages import Chat
 from app.domain.values.messages import Title
-from app.infra.repositories.messages import BaseChatRepository
+from app.infra.repositories.messages.base import BaseChatRepository
 from app.logic.commands.base import (
     BaseCommand,
     CommandHandler,
