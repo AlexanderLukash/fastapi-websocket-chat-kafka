@@ -9,6 +9,7 @@ from punq import Container
 
 from app.application.api.schemas import ErrorSchema
 from app.application.api.v1.messages.schemas import (
+    ChatDetailSchema,
     CreateChatRequestSchema,
     CreateChatResponseSchema,
     CreateMessageRequestSchema,
@@ -21,6 +22,7 @@ from app.logic.commands.messages import (
 )
 from app.logic.init import init_container
 from app.logic.mediator import Mediator
+from app.logic.queries.messages import GetChatDetailQuery
 
 
 router = APIRouter(
@@ -82,3 +84,29 @@ async def create_message_handler(
         )
 
     return CreateMessageResponseSchema.from_entity(message)
+
+
+@router.get(
+    "/{chat_oid}",
+    status_code=status.HTTP_200_OK,
+    description="Endpoint returns a chat and messages by its id.",
+    responses={
+        status.HTTP_200_OK: {"model": ChatDetailSchema},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorSchema},
+    },
+)
+async def get_chat_and_messages_handler(
+    chat_oid,
+    container: Container = Depends(init_container),
+) -> ChatDetailSchema:
+    mediator: Mediator = container.resolve(Mediator)
+
+    try:
+        chat = await mediator.handle_query(GetChatDetailQuery(chat_oid=chat_oid))
+    except ApplicationException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": exception.message},
+        )
+
+    return ChatDetailSchema.from_entity(chat)

@@ -21,6 +21,10 @@ from app.logic.commands.messages import (
     CreateMessageCommandHandler,
 )
 from app.logic.mediator import Mediator
+from app.logic.queries.messages import (
+    GetChatDetailQuery,
+    GetChatDetailQueryHandler,
+)
 from app.settings.config import Config
 
 
@@ -46,19 +50,6 @@ def _init_container() -> Container:
         factory=create_mongodb_client,
         scope=Scope.singleton,
     )
-
-    def init_mediator():
-        mediator = Mediator()
-        mediator.register_command(
-            CreateChatCommand,
-            [container.resolve(CreateChatCommandHandler)],
-        )
-        mediator.register_command(
-            CreateMessageCommand,
-            [container.resolve(CreateMessageCommandHandler)],
-        )
-
-        return mediator
 
     client = container.resolve(AsyncIOMotorClient)
 
@@ -90,6 +81,27 @@ def _init_container() -> Container:
 
     container.register(CreateChatCommandHandler)
     container.register(CreateMessageCommandHandler)
+
+    # Query Handlers
+    container.register(GetChatDetailQueryHandler)
+
+    def init_mediator():
+        mediator = Mediator()
+        mediator.register_command(
+            CreateChatCommand,
+            [container.resolve(CreateChatCommandHandler)],
+        )
+        mediator.register_command(
+            CreateMessageCommand,
+            [container.resolve(CreateMessageCommandHandler)],
+        )
+
+        mediator.register_query(
+            GetChatDetailQuery,
+            container.resolve(GetChatDetailQueryHandler),
+        )
+
+        return mediator
 
     container.register(Mediator, factory=init_mediator)
 
