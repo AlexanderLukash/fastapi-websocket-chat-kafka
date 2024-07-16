@@ -9,3 +9,7 @@ class Config(BaseSettings):
         default="chat",
         alias="MONGO_DB_CHAT_COLLECTION",
     )
+    mongodb_messages_collection: str = Field(
+        default="messages",
+        alias="MONGO_DB_MESSAGE_COLLECTION",
+    )

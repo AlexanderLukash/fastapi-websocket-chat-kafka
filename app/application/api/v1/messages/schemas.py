@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Iterable
 
 from pydantic import BaseModel
 
@@ -58,7 +57,6 @@ class MessageDetailSchema(BaseModel):
 class ChatDetailSchema(BaseModel):
     oid: str
     title: str
-    messages: Iterable[MessageDetailSchema]
     created_at: datetime
 
     @classmethod
@@ -66,8 +64,5 @@ class ChatDetailSchema(BaseModel):
         return ChatDetailSchema(
             oid=chat.oid,
             title=chat.title.as_generic_type(),
-            messages=[
-                MessageDetailSchema.from_entity(message) for message in chat.messages
-            ],
             created_at=chat.created_at,
         )

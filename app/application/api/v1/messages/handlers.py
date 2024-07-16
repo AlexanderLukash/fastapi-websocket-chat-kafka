@@ -89,13 +89,13 @@ async def create_message_handler(
 @router.get(
     "/{chat_oid}",
     status_code=status.HTTP_200_OK,
-    description="Endpoint returns a chat and messages by its id.",
+    description="Endpoint returns a chat by its oid.",
     responses={
         status.HTTP_200_OK: {"model": ChatDetailSchema},
         status.HTTP_404_NOT_FOUND: {"model": ErrorSchema},
     },
 )
-async def get_chat_and_messages_handler(
+async def get_chat_handler(
     chat_oid,
     container: Container = Depends(init_container),
 ) -> ChatDetailSchema:
