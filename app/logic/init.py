@@ -20,7 +20,7 @@ from app.logic.commands.messages import (
     CreateMessageCommand,
     CreateMessageCommandHandler,
 )
-from app.logic.mediator import Mediator
+from app.logic.mediator.mediator import Mediator
 from app.logic.queries.messages import (
     GetChatDetailQuery,
     GetChatDetailQueryHandler,

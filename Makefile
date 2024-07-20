@@ -5,6 +5,7 @@ ENV = --env-file .env
 APP_FILE = docker_compose\app.yaml
 STORAGES_FILE = docker_compose\storages.yaml
 APP_CONTAINER = main-app
+KAFKA = docker_compose/kafka.yaml
 
 
 
@@ -19,7 +20,7 @@ storages:
 
 .PHONY: all
 all:
-	${DC} -f ${STORAGES_FILE} -f ${APP_FILE} ${ENV} up --build -d
+	${DC} -f ${STORAGES_FILE} -f ${KAFKA} -f ${APP_FILE} ${ENV} up --build -d
 
 .PHONY: app-logs
 app-logs:

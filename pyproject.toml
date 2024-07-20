@@ -14,6 +14,7 @@ motor = "^3.4.0"
 uvicorn = {extras = ["all"], version = "^0.29.0"}
 punq = "^0.7.0"
 pydantic-settings = "^2.3.4"
+aiokafka = "^0.11.0"
 
 
 [tool.poetry.group.dev.dependencies]
