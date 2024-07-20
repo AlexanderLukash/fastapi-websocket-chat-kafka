@@ -5,7 +5,7 @@ from dataclasses import (
 
 from app.domain.entities.base import BaseEntity
 from app.domain.events.messages import (
-    NewChatCreated,
+    NewChatCreatedEvent,
     NewMessageReceivedEvent,
 )
 from app.domain.values.messages import (
@@ -32,9 +32,10 @@ class Chat(BaseEntity):
     def create_chat(cls, title: Title) -> "Chat":
         new_chat = cls(title=title)
         new_chat.register_event(
-            NewChatCreated(
+            NewChatCreatedEvent(
                 chat_oid=new_chat.oid,
                 chat_title=new_chat.title.as_generic_type(),
+                created_at=new_chat.created_at,
             ),
         )
 

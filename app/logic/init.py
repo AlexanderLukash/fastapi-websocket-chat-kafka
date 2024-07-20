@@ -1,11 +1,18 @@
 from functools import lru_cache
+from uuid import uuid4
 
+from aiokafka import (
+    AIOKafkaConsumer,
+    AIOKafkaProducer,
+)
 from motor.motor_asyncio import AsyncIOMotorClient
 from punq import (
     Container,
     Scope,
 )
 
+from app.infra.message_brokers.base import BaseMessageBroker
+from app.infra.message_brokers.kafka import KafkaMessageBroker
 from app.infra.repositories.messages.base import (
     BaseChatsRepository,
     BaseMessagesRepository,
@@ -20,6 +27,7 @@ from app.logic.commands.messages import (
     CreateMessageCommand,
     CreateMessageCommandHandler,
 )
+from app.logic.events.messages import NewChatCreatedEventHandler
 from app.logic.mediator.base import Mediator
 from app.logic.mediator.event import EventMediator
 from app.logic.queries.messages import (
@@ -89,8 +97,37 @@ def _init_container() -> Container:
     container.register(GetChatDetailQueryHandler)
     container.register(GetMessagesQueryHandler)
 
+    # Message Broker
+    def create_message_broker() -> BaseMessageBroker:
+        return KafkaMessageBroker(
+            producer=AIOKafkaProducer(bootstrap_servers=config.kafka_url),
+            consumer=AIOKafkaConsumer(
+                bootstrap_servers=config.kafka_url,
+                group_id=f"chats-{uuid4()}",
+                metadata_max_age_ms=30000,
+            ),
+        )
+
+    # Message Broker
+    container.register(
+        BaseMessageBroker,
+        factory=create_message_broker,
+        scope=Scope.singleton,
+    )
+
     def init_mediator() -> Mediator:
         mediator = Mediator()
+
+        # event handlers
+        new_chat_event_handler = NewChatCreatedEventHandler(
+            broker_topic=config.new_chats_event_topic,
+            message_broker=container.resolve(BaseMessageBroker),
+        )
+
+        mediator.register_event(
+            NewChatCreatedEventHandler,
+            [new_chat_event_handler],
+        )
 
         # command handlers
         create_chat_handler = CreateChatCommandHandler(

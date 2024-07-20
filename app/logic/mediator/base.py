@@ -66,15 +66,10 @@ class Mediator(
         result = []
         for event in events:
             handlers: Iterable[EventHandler] = self.events_map[event.__class__]
-            await self.message_broker.send_message(
-                topic=self.han,
-            )
 
             for handler in handlers:
                 result.append(await handler.handle(event=event))
             result.extend([await handler.handle(event) for handler in handlers])
-
-        await self.message_broker.send_message()
 
         return result
 

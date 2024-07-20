@@ -13,3 +13,6 @@ class Config(BaseSettings):
         default="messages",
         alias="MONGO_DB_MESSAGE_COLLECTION",
     )
+    kafka_url: str = Field(default="kafka:29092", alias="KAFKA_URL")
+
+    new_chats_event_topic: str = Field(default="new-chats-topic")
