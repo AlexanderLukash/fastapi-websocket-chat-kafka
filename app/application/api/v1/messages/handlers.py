@@ -24,7 +24,7 @@ from app.logic.commands.messages import (
     CreateMessageCommand,
 )
 from app.logic.init import init_container
-from app.logic.mediator.mediator import Mediator
+from app.logic.mediator.base import Mediator
 from app.logic.queries.messages import (
     GetChatDetailQuery,
     GetMessagesQuery,

@@ -9,7 +9,7 @@ from typing import (
     TypeVar,
 )
 
-from app.logic.mediator.base import EventMediator
+from app.logic.mediator.event import EventMediator
 
 
 @dataclass(frozen=True)

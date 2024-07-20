@@ -6,7 +6,7 @@ from app.domain.values.messages import Title
 from app.infra.repositories.messages.base import BaseChatsRepository
 from app.logic.commands.messages import CreateChatCommand
 from app.logic.exceptions.messages import ChatWithThatTitleAlreadyExistsException
-from app.logic.mediator.mediator import Mediator
+from app.logic.mediator.base import Mediator
 
 
 @pytest.mark.asyncio

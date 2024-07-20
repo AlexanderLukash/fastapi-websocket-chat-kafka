@@ -20,7 +20,8 @@ from app.logic.commands.messages import (
     CreateMessageCommand,
     CreateMessageCommandHandler,
 )
-from app.logic.mediator.mediator import Mediator
+from app.logic.mediator.base import Mediator
+from app.logic.mediator.event import EventMediator
 from app.logic.queries.messages import (
     GetChatDetailQuery,
     GetChatDetailQueryHandler,
@@ -88,17 +89,31 @@ def _init_container() -> Container:
     container.register(GetChatDetailQueryHandler)
     container.register(GetMessagesQueryHandler)
 
-    def init_mediator():
+    def init_mediator() -> Mediator:
         mediator = Mediator()
+
+        # command handlers
+        create_chat_handler = CreateChatCommandHandler(
+            _mediator=mediator,
+            chat_repository=container.resolve(BaseChatsRepository),
+        )
+        create_message_handler = CreateMessageCommandHandler(
+            _mediator=mediator,
+            message_repository=container.resolve(BaseMessagesRepository),
+            chat_repository=container.resolve(BaseChatsRepository),
+        )
+
+        # commands
         mediator.register_command(
             CreateChatCommand,
-            [container.resolve(CreateChatCommandHandler)],
+            [create_chat_handler],
         )
         mediator.register_command(
             CreateMessageCommand,
-            [container.resolve(CreateMessageCommandHandler)],
+            [create_message_handler],
         )
 
+        # Queries
         mediator.register_query(
             GetChatDetailQuery,
             container.resolve(GetChatDetailQueryHandler),
@@ -111,5 +126,6 @@ def _init_container() -> Container:
         return mediator
 
     container.register(Mediator, factory=init_mediator)
+    container.register(EventMediator, factory=init_mediator)
 
     return container
