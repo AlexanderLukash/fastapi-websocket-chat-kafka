@@ -35,6 +35,7 @@ class Chat(BaseEntity):
             NewChatCreatedEvent(
                 chat_oid=new_chat.oid,
                 chat_title=new_chat.title.as_generic_type(),
+                created_at=new_chat.created_at,
             ),
         )
 

@@ -30,7 +30,11 @@ from app.logic.queries.base import (
 
 
 @dataclass(eq=False)
-class Mediator(EventMediator, QueryMediator, CommandMediator):
+class Mediator(
+    EventMediator,
+    CommandMediator,
+    QueryMediator,
+):
     events_map: dict[ET, EventHandler] = field(
         default_factory=lambda: defaultdict(list),
         kw_only=True,
@@ -39,13 +43,14 @@ class Mediator(EventMediator, QueryMediator, CommandMediator):
         default_factory=lambda: defaultdict(list),
         kw_only=True,
     )
+
     queries_map: dict[QT, BaseQueryHandler] = field(
         default_factory=dict,
         kw_only=True,
     )
 
     def register_event(self, event: ET, event_handlers: Iterable[EventHandler[ET, ER]]):
-        self.events_map[event].extend(event_handlers)
+        self.events_map[event].append(event_handlers)
 
     def register_command(
         self,
@@ -59,14 +64,17 @@ class Mediator(EventMediator, QueryMediator, CommandMediator):
 
     async def publish(self, events: Iterable[BaseEvent]) -> Iterable[ER]:
         result = []
-
         for event in events:
             handlers: Iterable[EventHandler] = self.events_map[event.__class__]
+            await self.message_broker.send_message(
+                topic=self.han,
+            )
 
             for handler in handlers:
                 result.append(await handler.handle(event=event))
-
             result.extend([await handler.handle(event) for handler in handlers])
+
+        await self.message_broker.send_message()
 
         return result
 
