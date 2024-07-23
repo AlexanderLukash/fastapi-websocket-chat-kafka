@@ -66,8 +66,6 @@ class Mediator(EventMediator, QueryMediator, CommandMediator):
             for handler in handlers:
                 result.append(await handler.handle(event=event))
 
-            result.extend([await handler.handle(event) for handler in handlers])
-
         return result
 
     async def handle_command(self, command: BaseCommand) -> Iterable[CR]:
