@@ -39,7 +39,7 @@ class CreateChatCommandHandler(CommandHandler[CreateChatCommand, Chat]):
 
         new_chat = Chat.create_chat(title=title)
         await self.chat_repository.add_chat(new_chat)
-        self._mediator.publish(new_chat.pull_events())
+        await self._mediator.publish(new_chat.pull_events())
 
         return new_chat
 

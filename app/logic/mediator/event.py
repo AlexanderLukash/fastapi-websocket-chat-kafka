@@ -10,7 +10,6 @@ from dataclasses import (
 )
 
 from app.domain.events.base import BaseEvent
-from app.infra.message_brokers.base import BaseMessageBroker
 from app.logic.events.base import (
     ER,
     ET,
@@ -24,7 +23,6 @@ class EventMediator(ABC):
         default_factory=lambda: defaultdict(list),
         kw_only=True,
     )
-    message_broker: BaseMessageBroker
 
     @abstractmethod
     def register_event(

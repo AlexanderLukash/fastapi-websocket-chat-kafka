@@ -2,8 +2,8 @@ DC = docker compose
 EXEC = docker exec -it
 LOGS = docker logs
 ENV = --env-file .env
-APP_FILE = docker_compose\app.yaml
-STORAGES_FILE = docker_compose\storages.yaml
+APP_FILE = docker_compose/app.yaml
+STORAGES_FILE = docker_compose/storages.yaml
 APP_CONTAINER = main-app
 KAFKA = docker_compose/kafka.yaml
 
@@ -38,3 +38,8 @@ storages-down:
 .PHONY: test
 test:
 	${EXEC} ${APP_CONTAINER} pytest
+
+
+.PHONY: messaging-logs
+messaging-logs:
+	${DC} -f ${KAFKA} logs -f
