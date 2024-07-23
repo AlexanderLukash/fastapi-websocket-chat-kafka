@@ -7,7 +7,10 @@ from punq import (
     Scope,
 )
 
-from app.domain.events.messages import NewChatCreatedEvent
+from app.domain.events.messages import (
+    NewChatCreatedEvent,
+    NewMessageReceivedEvent,
+)
 from app.infra.message_brokers.base import BaseMessageBroker
 from app.infra.message_brokers.kafka import KafkaMessageBroker
 from app.infra.repositories.messages.base import (
@@ -24,7 +27,10 @@ from app.logic.commands.messages import (
     CreateMessageCommand,
     CreateMessageCommandHandler,
 )
-from app.logic.events.messages import NewChatCreatedEventHandler
+from app.logic.events.messages import (
+    NewChatCreatedEventHandler,
+    NewMessageReceivedEventHandler,
+)
 from app.logic.mediator.base import Mediator
 from app.logic.mediator.event import EventMediator
 from app.logic.queries.messages import (
@@ -116,9 +122,19 @@ def _init_container() -> Container:
             message_broker=container.resolve(BaseMessageBroker),
         )
 
+        new_message_received_event_handler = NewMessageReceivedEventHandler(
+            message_broker=container.resolve(BaseMessageBroker),
+            broker_topic=config.new_messages_received_event_topic,
+        )
+
         mediator.register_event(
             NewChatCreatedEvent,
             [new_chat_created_event_handler],
+        )
+
+        mediator.register_event(
+            NewMessageReceivedEvent,
+            [new_message_received_event_handler],
         )
 
         # command handlers
