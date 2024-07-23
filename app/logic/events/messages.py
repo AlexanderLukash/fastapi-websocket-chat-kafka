@@ -9,7 +9,7 @@ from app.logic.events.base import EventHandler
 class NewChatCreatedEventHandler(EventHandler[NewChatCreatedEvent, None]):
     async def handle(self, event: NewChatCreatedEvent) -> None:
         await self.message_broker.send_message(
+            key=str(event.event_id).encode(),
             topic=self.broker_topic,
             value=convert_event_to_broker_message(event=event),
         )
-        print(f"Обработали событие {event.title}")

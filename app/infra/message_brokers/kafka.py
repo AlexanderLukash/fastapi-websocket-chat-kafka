@@ -9,7 +9,7 @@ from app.infra.message_brokers.base import BaseMessageBroker
 class KafkaMessageBroker(BaseMessageBroker):
     producer: AIOKafkaProducer
 
-    async def send_message(self, topic: str, value: bytes):
-        await self.producer.send_and_wait(topic=topic, value=value)
+    async def send_message(self, key: bytes, topic: str, value: bytes):
+        await self.producer.send_and_wait(key=key, topic=topic, value=value)
 
     async def consume(self, topic: str): ...
