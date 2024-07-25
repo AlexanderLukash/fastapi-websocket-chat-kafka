@@ -32,8 +32,8 @@ from app.logic.queries.messages import (
 
 
 router = APIRouter(
-    prefix="/chat",
-    tags=["Chat"],
+    prefix="/chats",
+    tags=["Chats"],
 )
 
 

@@ -3,17 +3,17 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.application.api.lifespan import (
-    close_kafka,
-    start_kafka,
+    close_message_broker,
+    init_message_broker,
 )
 from app.application.api.v1.urls import router as v1_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await start_kafka()
+    await init_message_broker()
     yield
-    await close_kafka()
+    await close_message_broker()
 
 
 def create_app():
