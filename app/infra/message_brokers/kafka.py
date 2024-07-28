@@ -1,8 +1,9 @@
 from dataclasses import (
     dataclass,
-    field,
 )
+from typing import AsyncIterator
 
+import orjson
 from aiokafka import (
     AIOKafkaConsumer,
     AIOKafkaProducer,
@@ -15,19 +16,15 @@ from app.infra.message_brokers.base import BaseMessageBroker
 class KafkaMessageBroker(BaseMessageBroker):
     producer: AIOKafkaProducer
     consumer: AIOKafkaConsumer
-    consumer_map: dict[str, AIOKafkaConsumer] = field(
-        default_factory=dict,
-        kw_only=True,
-    )
 
     async def send_message(self, key: bytes, topic: str, value: bytes):
         await self.producer.send_and_wait(key=key, topic=topic, value=value)
 
-    async def start_consuming(self, topic: str):
+    async def start_consuming(self, topic: str) -> AsyncIterator[dict]:
         self.consumer.subscribe(topics=[topic])
 
-    async def consume(self, topic: str) -> dict:
-        return await self.consumer.getone()
+        async for message in self.consumer:
+            yield orjson.loads(message.value)
 
     async def stop_consuming(self):
         self.consumer.unsubscribe()

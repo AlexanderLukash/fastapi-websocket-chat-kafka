@@ -4,6 +4,10 @@ from fastapi import Depends
 from fastapi.routing import APIRouter
 from fastapi.websockets import WebSocket
 
+from app.application.api.common.websockets.managers import (
+    BaseConnectionManager,
+    ConnectionManager,
+)
 from app.infra.message_brokers.base import BaseMessageBroker
 from app.logic.init import init_container
 from app.settings.config import Config
@@ -20,17 +24,22 @@ async def messages_handler(
     websocket: WebSocket,
     container=Depends(init_container),
 ):
-    await websocket.accept()
     config: Config = container.resolve(Config)
 
     message_broker: BaseMessageBroker = container.resolve(BaseMessageBroker)
-    await message_broker.start_consuming(
-        topic=config.new_messages_received_event_topic.format(chat_oid=chat_oid),
-    )
+    connection_manager: ConnectionManager = container.resolve(BaseConnectionManager)
+    await connection_manager.accept_connection(websocket=websocket, key=str(chat_oid))
 
-    while True:
-        try:
-            await websocket.send_json(await message_broker.consume)
-        finally:
-            await message_broker.stop_consuming()
-            await websocket.close(reason="Disconnected.")
+    try:
+        async for message in message_broker.start_consuming(
+            topic=config.new_messages_received_event_topic,
+        ):
+            await connection_manager.send_all(key=str(chat_oid), json_message=message)
+    finally:
+        await connection_manager.remove_connection(
+            websocket=websocket,
+            key=str(chat_oid),
+        )
+        await message_broker.stop_consuming()
+
+    await websocket.close(reason="Disconnected.")

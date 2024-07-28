@@ -10,6 +10,10 @@ from punq import (
     Scope,
 )
 
+from app.application.api.common.websockets.managers import (
+    ConnectionManager,
+    BaseConnectionManager,
+)
 from app.domain.events.messages import (
     NewChatCreatedEvent,
     NewMessageReceivedEvent,
@@ -179,5 +183,10 @@ def _init_container() -> Container:
 
     container.register(Mediator, factory=init_mediator)
     container.register(EventMediator, factory=init_mediator)
+    container.register(
+        BaseConnectionManager,
+        instance=ConnectionManager(),
+        scope=Scope.singleton,
+    )
 
     return container

@@ -17,5 +17,5 @@ class Config(BaseSettings):
 
     new_chats_event_topic: str = Field(default="new-chats-topic")
     new_messages_received_event_topic: str = Field(
-        default="chat-{chat_oid}-new-messages",
+        default="new-messages-topic",
     )
