@@ -3,7 +3,6 @@ from dataclasses import (
     field,
 )
 
-import orjson
 from aiokafka import (
     AIOKafkaConsumer,
     AIOKafkaProducer,
@@ -27,8 +26,8 @@ class KafkaMessageBroker(BaseMessageBroker):
     async def start_consuming(self, topic: str):
         self.consumer.subscribe(topics=[topic])
 
-        async for message in self.consumer:
-            yield orjson.loads(message.value)
+    async def consume(self, topic: str) -> dict:
+        return await self.consumer.getone()
 
     async def stop_consuming(self):
         self.consumer.unsubscribe()

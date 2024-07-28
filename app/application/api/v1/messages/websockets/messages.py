@@ -8,7 +8,6 @@ from app.infra.message_brokers.base import BaseMessageBroker
 from app.logic.init import init_container
 from app.settings.config import Config
 
-
 router = APIRouter(
     prefix="/chats",
     tags=["chats"],
@@ -25,13 +24,13 @@ async def messages_handler(
     config: Config = container.resolve(Config)
 
     message_broker: BaseMessageBroker = container.resolve(BaseMessageBroker)
-    try:
-        async for consume_message in message_broker.start_consuming(
-            topic=config.new_messages_received_event_topic.format(chat_oid=chat_oid),
-        ):
-            await websocket.send_json(consume_message)
-    except Exception as exception:
-        raise exception
+    await message_broker.start_consuming(
+        topic=config.new_messages_received_event_topic.format(chat_oid=chat_oid),
+    )
 
-    await message_broker.stop_consuming()
-    await websocket.close(reason="Disconnected.")
+    while True:
+        try:
+            await websocket.send_json(await message_broker.consume)
+        finally:
+            await message_broker.stop_consuming()
+            await websocket.close(reason="Disconnected.")
