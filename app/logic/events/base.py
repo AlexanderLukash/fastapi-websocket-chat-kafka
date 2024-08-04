@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -8,15 +8,21 @@ from typing import (
 
 from app.domain.events.base import BaseEvent
 from app.infra.message_brokers.base import BaseMessageBroker
-
+from app.infra.websockets.managers import BaseConnectionManager
 
 ET = TypeVar("ET", bound=BaseEvent)
 ER = TypeVar("ER", bound=Any)
 
 
 @dataclass
-class EventHandler(ABC, Generic[ET, ER]):
-    broker_topic: str | None
-    message_broker: BaseMessageBroker
+class IntegrationEvent(BaseEvent, ABC): ...
 
+
+@dataclass
+class EventHandler(ABC, Generic[ET, ER]):
+    message_broker: BaseMessageBroker
+    connection_manager: BaseConnectionManager
+    broker_topic: str | None = None
+
+    @abstractmethod
     def handle(self, event: ET) -> ER: ...

@@ -30,10 +30,9 @@ from app.logic.queries.messages import (
     GetMessagesQuery,
 )
 
-
 router = APIRouter(
-    prefix="/chat",
-    tags=["Chat"],
+    prefix="/chats",
+    tags=["Chats"],
 )
 
 
@@ -48,8 +47,9 @@ router = APIRouter(
 )
 async def create_chat_handler(
     schema: CreateChatRequestSchema,
-    container=Depends(init_container),
-):
+    container: Container = Depends(init_container),
+) -> CreateChatResponseSchema:
+    """Create a new chat."""
     mediator: Mediator = container.resolve(Mediator)
 
     try:
@@ -66,7 +66,7 @@ async def create_chat_handler(
 @router.post(
     "/{chat_oid}/messages",
     status_code=status.HTTP_201_CREATED,
-    description="Endpoint creates a new message in a chat.",
+    description="Handle for adding a new message to the chat with the passed ObjectID.",
     responses={
         status.HTTP_201_CREATED: {"model": CreateMessageResponseSchema},
         status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
@@ -77,6 +77,7 @@ async def create_message_handler(
     schema: CreateMessageRequestSchema,
     container: Container = Depends(init_container),
 ) -> CreateMessageResponseSchema:
+    """Add a new message to the chat."""
     mediator: Mediator = container.resolve(Mediator)
 
     try:
@@ -93,16 +94,16 @@ async def create_message_handler(
 
 
 @router.get(
-    "/{chat_oid}",
+    "/{chat_oid}/",
     status_code=status.HTTP_200_OK,
-    description="Endpoint returns a chat by its oid.",
+    description="Get information about the chat and all messages in it.",
     responses={
         status.HTTP_200_OK: {"model": ChatDetailSchema},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorSchema},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
     },
 )
-async def get_chat_handler(
-    chat_oid,
+async def get_chat_with_messages_handler(
+    chat_oid: str,
     container: Container = Depends(init_container),
 ) -> ChatDetailSchema:
     mediator: Mediator = container.resolve(Mediator)
@@ -119,12 +120,12 @@ async def get_chat_handler(
 
 
 @router.get(
-    "/{chat_oid}/messages",
+    "/{chat_oid}/messages/",
     status_code=status.HTTP_200_OK,
-    description="Get sent messages in chat.",
+    description="All sent chat messages.",
     responses={
         status.HTTP_200_OK: {"model": GetMessagesQueryResponseSchema},
-        status.HTTP_404_NOT_FOUND: {"model": ErrorSchema},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
     },
 )
 async def get_chat_messages_handler(

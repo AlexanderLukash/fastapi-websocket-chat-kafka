@@ -31,6 +31,10 @@ app-logs:
 app-down:
 	${DC} -f ${APP_FILE} down
 
+.PHONY: all-down
+all-down:
+	${DC} -f ${STORAGES_FILE} -f ${KAFKA} -f ${APP_FILE} ${ENV} down
+
 .PHONY: storages-down
 storages-down:
 	${DC} -f ${STORAGES_FILE} down
@@ -38,3 +42,8 @@ storages-down:
 .PHONY: test
 test:
 	${EXEC} ${APP_CONTAINER} pytest
+
+
+.PHONY: messaging-logs
+messaging-logs:
+	${DC} -f ${KAFKA} logs -f
