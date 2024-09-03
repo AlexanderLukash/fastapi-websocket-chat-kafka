@@ -59,6 +59,9 @@ class MongoDBChatsRepository(BaseChatsRepository, BaseMongoDBRepository):
     async def add_chat(self, chat: Chat) -> None:
         await self._collection.insert_one(convert_chat_entity_to_document(chat))
 
+    async def get_all_chat(self, limit: int, offset: int) -> Iterable[Chat]:
+        return await self._collection.find()
+
 
 @dataclass
 class MongoDBMessagesRepository(BaseMessagesRepository, BaseMongoDBRepository):
