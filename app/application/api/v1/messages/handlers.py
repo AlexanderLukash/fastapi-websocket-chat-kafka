@@ -8,7 +8,7 @@ from fastapi.routing import APIRouter
 from punq import Container
 
 from app.application.api.schemas import ErrorSchema
-from app.application.api.v1.messages.filters import GetMessagesFilters
+from app.application.api.v1.messages.filters import GetMessagesFilters, GetChatsFilters
 from app.application.api.v1.messages.schemas import (
     ChatDetailSchema,
     CreateChatRequestSchema,
@@ -17,6 +17,7 @@ from app.application.api.v1.messages.schemas import (
     CreateMessageResponseSchema,
     GetMessagesQueryResponseSchema,
     MessageDetailSchema,
+    GetChatsQueryResponseSchema,
 )
 from app.domain.exceptions.base import ApplicationException
 from app.logic.commands.messages import (
@@ -28,6 +29,7 @@ from app.logic.mediator.base import Mediator
 from app.logic.queries.messages import (
     GetChatDetailQuery,
     GetMessagesQuery,
+    GetAllChatsQuery,
 )
 
 router = APIRouter(
@@ -150,4 +152,37 @@ async def get_chat_messages_handler(
         limit=filters.limit,
         offset=filters.offset,
         items=[MessageDetailSchema.from_entity(message) for message in messages],
+    )
+
+
+@router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    description="All chat at that moment.",
+    responses={
+        status.HTTP_200_OK: {"model": GetChatsQueryResponseSchema},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
+    },
+)
+async def get_all_chats_handler(
+    filters: GetChatsFilters = Depends(),
+    container: Container = Depends(init_container),
+) -> GetChatsQueryResponseSchema:
+    mediator: Mediator = container.resolve(Mediator)
+
+    try:
+        chats, count = await mediator.handle_query(
+            GetAllChatsQuery(filters=filters.to_infra()),
+        )
+    except ApplicationException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": exception.message},
+        )
+
+    return GetChatsQueryResponseSchema(
+        count=count,
+        limit=filters.limit,
+        offset=filters.offset,
+        items=[ChatDetailSchema.from_entity(chat) for chat in chats],
     )

@@ -8,7 +8,10 @@ from app.domain.entities.messages import (
     Chat,
     Message,
 )
-from app.infra.repositories.filters.messages import GetMessagesFilters
+from app.infra.repositories.filters.messages import (
+    GetMessagesFilters,
+    GetAllChatsFilters,
+)
 from app.infra.repositories.messages.base import (
     BaseChatsRepository,
     BaseMessagesRepository,
@@ -59,8 +62,18 @@ class MongoDBChatsRepository(BaseChatsRepository, BaseMongoDBRepository):
     async def add_chat(self, chat: Chat) -> None:
         await self._collection.insert_one(convert_chat_entity_to_document(chat))
 
-    async def get_all_chat(self, limit: int, offset: int) -> Iterable[Chat]:
-        return await self._collection.find()
+    async def get_all_chats(
+        self,
+        filters: GetAllChatsFilters,
+    ) -> tuple[Iterable[Chat], int]:
+        cursor = self._collection.find().skip(filters.offset).limit(filters.limit)
+        count = await self._collection.count_documents({})
+        chats = [
+            convert_chat_document_to_entity(chat_document=chat_document)
+            async for chat_document in cursor
+        ]
+
+        return chats, count
 
 
 @dataclass
