@@ -19,3 +19,4 @@ class Config(BaseSettings):
     new_messages_received_event_topic: str = Field(
         default="new-messages-topic",
     )
+    chat_deleted_event_topic: str = Field(default="chat-deleted-topic")

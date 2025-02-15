@@ -7,7 +7,7 @@ from fastapi.websockets import WebSocket
 
 from punq import Container
 
-from app.application.api.common.websockets.managers import BaseConnectionManager
+from app.infra.websockets.managers import BaseConnectionManager
 from app.logic.init import init_container
 
 router = APIRouter(

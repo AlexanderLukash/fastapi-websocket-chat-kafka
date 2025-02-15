@@ -7,6 +7,7 @@ from app.domain.entities.base import BaseEntity
 from app.domain.events.messages import (
     NewChatCreatedEvent,
     NewMessageReceivedEvent,
+    ChatDeletedEvent,
 )
 from app.domain.values.messages import (
     Text,
@@ -23,10 +24,8 @@ class Message(BaseEntity):
 @dataclass(eq=False)
 class Chat(BaseEntity):
     title: Title
-    messages: set[Message] = field(
-        default_factory=set,
-        kw_only=True,
-    )
+    messages: set[Message] = field(default_factory=set, kw_only=True)
+    is_deleted: bool = field(default=False, kw_only=True)
 
     @classmethod
     def create_chat(cls, title: Title) -> "Chat":
@@ -49,3 +48,6 @@ class Chat(BaseEntity):
                 message_oid=message.oid,
             ),
         )
+
+    def delete(self):
+        self.register_event(ChatDeletedEvent(chat_oid=self.oid))

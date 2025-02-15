@@ -30,6 +30,9 @@ class BaseChatsRepository(ABC):
     async def add_chat(self, chat: Chat) -> None: ...
 
     @abstractmethod
+    async def delete_chat_by_oid(self, chat_oid: str) -> None: ...
+
+    @abstractmethod
     async def get_all_chats(
         self,
         filters: GetAllChatsFilters,
