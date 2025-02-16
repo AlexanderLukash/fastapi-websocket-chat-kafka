@@ -8,7 +8,10 @@ from app.domain.entities.messages import (
     Chat,
     Message,
 )
-from app.infra.repositories.filters.messages import GetMessagesFilters
+from app.infra.repositories.filters.messages import (
+    GetMessagesFilters,
+    GetAllChatsFilters,
+)
 from app.infra.repositories.messages.base import (
     BaseChatsRepository,
     BaseMessagesRepository,
@@ -48,10 +51,25 @@ class GetMessagesQuery(BaseQuery):
 
 
 @dataclass(frozen=True)
+class GetAllChatsQuery(BaseQuery):
+    filters: GetAllChatsFilters
+
+
+@dataclass(frozen=True)
+class GetAllChatsQueryHandler(BaseQueryHandler[GetAllChatsQuery, Iterable[Chat]]):
+    chat_repository: BaseChatsRepository
+
+    async def handle(self, query: GetAllChatsQuery) -> tuple[Iterable[Chat], int]:
+        return await self.chat_repository.get_all_chats(
+            filters=query.filters,
+        )
+
+
+@dataclass(frozen=True)
 class GetMessagesQueryHandler(BaseQueryHandler):
     messages_repository: BaseMessagesRepository
 
-    async def handle(self, query: GetMessagesQuery) -> Iterable[Message]:
+    async def handle(self, query: GetMessagesQuery) -> tuple[Iterable[Message], int]:
         return await self.messages_repository.get_messages(
             chat_oid=query.chat_oid,
             filters=query.filters,

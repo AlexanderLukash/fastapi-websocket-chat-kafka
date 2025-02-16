@@ -52,7 +52,7 @@ class Mediator(EventMediator, QueryMediator, CommandMediator):
         command: CT,
         command_handlers: Iterable[CommandHandler[CT, CR]],
     ):
-        self.events_map[command].extend(command_handlers)
+        self.commands_map[command].extend(command_handlers)
 
     def register_query(self, query: QT, query_handler: BaseQueryHandler[QT, QR]) -> QR:
         self.queries_map[query] = query_handler
@@ -68,7 +68,7 @@ class Mediator(EventMediator, QueryMediator, CommandMediator):
 
     async def handle_command(self, command: BaseCommand) -> Iterable[CR]:
         command_type = command.__class__
-        handlers = self.events_map.get(command_type)
+        handlers = self.commands_map.get(command_type)
 
         if not handlers:
             raise CommandHandlersNotRegisteredException(command_type)

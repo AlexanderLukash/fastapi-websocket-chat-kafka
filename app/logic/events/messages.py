@@ -4,6 +4,7 @@ from typing import ClassVar
 from app.domain.events.messages import (
     NewChatCreatedEvent,
     NewMessageReceivedEvent,
+    ChatDeletedEvent,
 )
 from app.infra.message_brokers.converters import convert_event_to_broker_message
 from app.logic.events.base import (
@@ -50,3 +51,14 @@ class NewMessageReceivedFromBrokerEventHandler(
             key=event.chat_oid,
             bytes_=convert_event_to_broker_message(event=event),
         )
+
+
+@dataclass
+class ChatDeleteEventHandler(EventHandler[ChatDeletedEvent, None]):
+    async def handle(self, event: ChatDeletedEvent) -> None:
+        await self.message_broker.send_message(
+            topic=self.broker_topic,
+            value=convert_event_to_broker_message(event=event),
+            key=event.chat_oid.encode(),
+        )
+        await self.connection_manager.disconnect_all(event.chat_oid)

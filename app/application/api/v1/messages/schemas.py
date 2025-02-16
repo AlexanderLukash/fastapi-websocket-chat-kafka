@@ -71,3 +71,7 @@ class ChatDetailSchema(BaseModel):
             title=chat.title.as_generic_type(),
             created_at=chat.created_at,
         )
+
+
+class GetChatsQueryResponseSchema(BaseQueryResponseSchema):
+    items: list[ChatDetailSchema]
