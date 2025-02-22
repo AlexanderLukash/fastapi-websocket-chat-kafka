@@ -38,6 +38,9 @@ class BaseChatsRepository(ABC):
         filters: GetAllChatsFilters,
     ) -> tuple[Iterable[Chat], int]: ...
 
+    @abstractmethod
+    async def add_telegram_listener(self, chat_oid: str, telegram_chat_id: str): ...
+
 
 @dataclass
 class BaseMessagesRepository(ABC):

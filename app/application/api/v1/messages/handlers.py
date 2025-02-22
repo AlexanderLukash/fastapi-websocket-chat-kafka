@@ -18,12 +18,15 @@ from app.application.api.v1.messages.schemas import (
     GetMessagesQueryResponseSchema,
     MessageDetailSchema,
     GetChatsQueryResponseSchema,
+    AddTelegramListenerSchema,
+    AddTelegramListenerResponseSchema,
 )
 from app.domain.exceptions.base import ApplicationException
 from app.logic.commands.messages import (
     CreateChatCommand,
     CreateMessageCommand,
     DeleteChatCommand,
+    AddTelegramListenerCommand,
 )
 from app.logic.init import init_container
 from app.logic.mediator.base import Mediator
@@ -208,3 +211,33 @@ async def delete_chat_handler(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"error": exception.message},
         )
+
+
+@router.post(
+    "/{chat_oid}/listeners/",
+    status_code=status.HTTP_201_CREATED,
+    summary="Add telegram listener to chat.",
+    description="Add telegram listener to chat.",
+    operation_id="addTelegramListener",
+    response_model=AddTelegramListenerResponseSchema,
+)
+async def add_telegram_listener_handler(
+    chat_oid: str,
+    schema: AddTelegramListenerSchema,
+    container: Container = Depends(init_container),
+) -> AddTelegramListenerResponseSchema:
+    mediator: Mediator = container.resolve(Mediator)
+
+    try:
+        listener, *_ = await mediator.handle_command(
+            AddTelegramListenerCommand(
+                chat_oid=chat_oid,
+                telegram_chat_id=schema.telegram_chat_id,
+            ),
+        )
+    except ApplicationException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": exception.message},
+        )
+    return AddTelegramListenerResponseSchema.from_entity(listener)

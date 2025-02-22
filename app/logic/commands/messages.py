@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from app.domain.entities.messages import (
     Chat,
     Message,
+    ChatListener,
 )
 from app.domain.values.messages import (
     Text,
@@ -88,3 +89,32 @@ class DeleteChatCommandHandler(CommandHandler[DeleteChatCommand, None]):
         await self.chat_repository.delete_chat_by_oid(chat_oid=command.chat_oid)
         chat.delete()
         await self._mediator.publish(chat.pull_events())
+
+
+@dataclass(frozen=True)
+class AddTelegramListenerCommand(BaseCommand):
+    chat_oid: str
+    telegram_chat_id: str
+
+
+@dataclass(frozen=True)
+class AddTelegramListenerCommandHandler(
+    CommandHandler[AddTelegramListenerCommand, ChatListener],
+):
+    chat_repository: BaseChatsRepository
+
+    async def handle(self, command: AddTelegramListenerCommand) -> ChatListener:
+        chat = await self.chat_repository.get_chat_by_oid(oid=command.chat_oid)
+
+        if not chat:
+            raise ChatNotFoundException(chat_oid=command.chat_oid)
+
+        listener = ChatListener(oid=command.telegram_chat_id)
+        chat.add_listener(listener)
+
+        await self.chat_repository.add_telegram_listener(
+            chat_oid=command.chat_oid,
+            telegram_chat_id=command.telegram_chat_id,
+        )
+        await self._mediator.publish(chat.pull_events())
+        return listener
