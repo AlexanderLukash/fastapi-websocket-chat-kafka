@@ -12,7 +12,6 @@ from punq import (
     Scope,
 )
 
-
 from app.domain.events.messages import (
     NewChatCreatedEvent,
     NewMessageReceivedEvent,
@@ -57,6 +56,8 @@ from app.logic.queries.messages import (
     GetMessagesQueryHandler,
     GetAllChatsQuery,
     GetAllChatsQueryHandler,
+    GetAllChatsListenersQuery,
+    GetAllChatsListenersQueryHandler,
 )
 from app.settings.config import Config
 
@@ -119,6 +120,7 @@ def _init_container() -> Container:
     container.register(GetChatDetailQueryHandler)
     container.register(GetMessagesQueryHandler)
     container.register(GetAllChatsQueryHandler)
+    container.register(GetAllChatsListenersQueryHandler)
 
     def create_message_broker() -> BaseMessageBroker:
         return KafkaMessageBroker(
@@ -249,6 +251,10 @@ def _init_container() -> Container:
         mediator.register_query(
             GetAllChatsQuery,
             container.resolve(GetAllChatsQueryHandler),
+        )
+        mediator.register_query(
+            GetAllChatsListenersQuery,
+            container.resolve(GetAllChatsListenersQueryHandler),
         )
 
         return mediator
