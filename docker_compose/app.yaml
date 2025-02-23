@@ -16,10 +16,3 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_started
-
-    networks:
-      - backend
-
-networks:
-  backend:
-    driver: bridge
