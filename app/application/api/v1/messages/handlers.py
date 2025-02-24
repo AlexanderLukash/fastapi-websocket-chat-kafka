@@ -72,7 +72,7 @@ async def create_chat_handler(
 
 
 @router.post(
-    "/{chat_oid}/messages",
+    "/{chat_oid}/messages/",
     status_code=status.HTTP_201_CREATED,
     description="Handle for adding a new message to the chat with the passed ObjectID.",
     responses={
