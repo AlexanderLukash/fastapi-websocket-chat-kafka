@@ -20,6 +20,7 @@ from app.application.api.v1.messages.schemas import (
     GetChatsQueryResponseSchema,
     AddTelegramListenerSchema,
     AddTelegramListenerResponseSchema,
+    ChatListenersListItemsSchema,
 )
 from app.domain.exceptions.base import ApplicationException
 from app.logic.commands.messages import (
@@ -34,6 +35,7 @@ from app.logic.queries.messages import (
     GetChatDetailQuery,
     GetMessagesQuery,
     GetAllChatsQuery,
+    GetAllChatsListenersQuery,
 )
 
 router = APIRouter(
@@ -70,7 +72,7 @@ async def create_chat_handler(
 
 
 @router.post(
-    "/{chat_oid}/messages",
+    "/{chat_oid}/messages/",
     status_code=status.HTTP_201_CREATED,
     description="Handle for adding a new message to the chat with the passed ObjectID.",
     responses={
@@ -88,7 +90,11 @@ async def create_message_handler(
 
     try:
         message, *_ = await mediator.handle_command(
-            CreateMessageCommand(text=schema.text, chat_oid=chat_oid),
+            CreateMessageCommand(
+                text=schema.text,
+                source=schema.source,
+                chat_oid=chat_oid,
+            ),
         )
     except ApplicationException as exception:
         raise HTTPException(
@@ -241,3 +247,34 @@ async def add_telegram_listener_handler(
             detail={"error": exception.message},
         )
     return AddTelegramListenerResponseSchema.from_entity(listener)
+
+
+@router.get(
+    "/{chat_oid}/listeners/",
+    status_code=status.HTTP_200_OK,
+    description="Get all chat listeners.",
+    responses={
+        status.HTTP_200_OK: {"model": list[ChatListenersListItemsSchema]},
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorSchema},
+    },
+)
+async def get_all_chat_listeners_handler(
+    chat_oid: str,
+    container: Container = Depends(init_container),
+) -> list[ChatListenersListItemsSchema]:
+    mediator: Mediator = container.resolve(Mediator)
+
+    try:
+        chat_listeners = await mediator.handle_query(
+            GetAllChatsListenersQuery(chat_oid=chat_oid),
+        )
+    except ApplicationException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"error": exception.message},
+        )
+
+    return [
+        ChatListenersListItemsSchema.from_entity(listener=chat_listener)
+        for chat_listener in chat_listeners
+    ]

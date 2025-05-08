@@ -6,8 +6,7 @@ services:
       - '27017:27017'
     volumes:
       - dbdata:/data/db
-    networks:
-      - backend
+
 
   mongo-express:
     image: mongo-express
@@ -22,12 +21,8 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
     depends_on:
       - mongodb
-    networks:
-      - backend
+
 
 volumes:
   dbdata:
 
-networks:
-  backend:
-    driver: bridge

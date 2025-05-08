@@ -28,6 +28,7 @@ class CreateChatResponseSchema(BaseModel):
 
 class CreateMessageRequestSchema(BaseModel):
     text: str
+    source: str = "web"
 
 
 class CreateMessageResponseSchema(BaseModel):
@@ -45,6 +46,7 @@ class CreateMessageResponseSchema(BaseModel):
 class MessageDetailSchema(BaseModel):
     oid: str
     text: str
+    source: str
     created_at: datetime
 
     @classmethod
@@ -52,6 +54,7 @@ class MessageDetailSchema(BaseModel):
         return cls(
             oid=message.oid,
             text=message.text.as_generic_type(),
+            source=message.source,
             created_at=message.created_at,
         )
 
@@ -89,4 +92,14 @@ class AddTelegramListenerResponseSchema(BaseModel):
     def from_entity(cls, listener: ChatListener) -> "AddTelegramListenerResponseSchema":
         return cls(
             listener_id=listener.oid,
+        )
+
+
+class ChatListenersListItemsSchema(BaseModel):
+    oid: str
+
+    @classmethod
+    def from_entity(cls, listener: ChatListener) -> "ChatListenersListItemsSchema":
+        return cls(
+            oid=listener.oid,
         )
