@@ -90,7 +90,11 @@ async def create_message_handler(
 
     try:
         message, *_ = await mediator.handle_command(
-            CreateMessageCommand(text=schema.text, chat_oid=chat_oid),
+            CreateMessageCommand(
+                text=schema.text,
+                source=schema.source,
+                chat_oid=chat_oid,
+            ),
         )
     except ApplicationException as exception:
         raise HTTPException(

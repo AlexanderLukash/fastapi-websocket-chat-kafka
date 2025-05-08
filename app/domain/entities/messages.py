@@ -21,6 +21,7 @@ from app.domain.values.messages import (
 class Message(BaseEntity):
     chat_oid: str
     text: Text
+    source: str
 
 
 @dataclass(eq=False)
@@ -53,6 +54,7 @@ class Chat(BaseEntity):
                 message_text=message.text.as_generic_type(),
                 chat_oid=self.oid,
                 message_oid=message.oid,
+                source=message.source,
             ),
         )
 

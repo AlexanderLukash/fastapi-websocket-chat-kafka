@@ -36,8 +36,6 @@ async def websocket_endpoint(
 
     await connection_manager.accept_connection(websocket=websocket, key=chat_oid)
 
-    await websocket.send_text("You are now connected!")
-
     try:
         while True:
             await websocket.receive_text()

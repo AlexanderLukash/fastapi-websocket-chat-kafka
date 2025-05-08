@@ -54,6 +54,11 @@ class ConnectionManager(BaseConnectionManager):
             await websocket.send_bytes(bytes_)
 
     async def disconnect_all(self, key: str):
+        lock = self.lock_map.get(key)
+
+        if lock is None:
+            return
+
         async with self.lock_map[key]:
             for websocket in self.connections_map[key]:
                 await websocket.send_json(

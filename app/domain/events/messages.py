@@ -11,6 +11,7 @@ class NewMessageReceivedEvent(BaseEvent):
     message_text: str
     message_oid: str
     chat_oid: str
+    source: str
 
 
 @dataclass
